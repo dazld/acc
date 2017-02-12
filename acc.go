@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -10,6 +11,12 @@ import (
 
 var client = &http.Client{
 	Timeout: time.Second * 1,
+}
+
+type Nested struct {
+	Headers struct {
+		Accept string `json:"Accept"`
+	} `json:"headers"`
 }
 
 func main() {
@@ -26,5 +33,10 @@ func main() {
 		spew.Dump(err)
 		return
 	}
+	var heads Nested
+	if err := json.NewDecoder(r.Body).Decode(&heads); err != nil {
+		spew.Dump(err)
+	}
 	spew.Dump(buf)
+	spew.Dump(heads.Headers.Accept)
 }
